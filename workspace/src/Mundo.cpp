@@ -4,7 +4,8 @@
 #include <fstream>
 #include "Mundo.h"
 #include "glut.h"
-
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,7 @@ CMundo::CMundo()
 
 CMundo::~CMundo()
 {
-
+close(fd);
 }
 
 void CMundo::InitGL()
@@ -135,7 +136,12 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=2+2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=2+2*rand()/(float)RAND_MAX;
 		puntos2++;
-	}
+		char mensaje[100];
+	sprintf(mensaje, "Jugador 2 marca 1 punto, lleva un total de %d puntos.\n", puntos2);
+	write(fd, mensaje, strlen(mensaje));
+	if (puntos2 >= 3)
+    		exit(0);
+}
 
 	if(fondo_dcho.Rebota(esfera))
 	{
@@ -144,7 +150,12 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=-2-2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=-2-2*rand()/(float)RAND_MAX;
 		puntos1++;
-	}
+		char mensaje[100];
+		sprintf(mensaje, "Jugador 1 marca 1 punto, lleva un total de %d puntos.\n", puntos1);
+		write(fd, mensaje, strlen(mensaje));
+		if (puntos1 >= 3)
+   			 exit(0);
+}
 
 }
 
@@ -164,6 +175,7 @@ void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
 
 void CMundo::Init()
 {
+fd = open("/tmp/fifo", O_WRONLY);
 	Plano p;
 //pared inferior
 	p.x1=-7;p.y1=-5;

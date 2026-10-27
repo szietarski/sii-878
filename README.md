@@ -1,4 +1,4 @@
-# Práctica 1 Entorno de desarrollo Linux
+S# Práctica 1 Entorno de desarrollo Linux
 
 ## Descripción
 
@@ -14,3 +14,14 @@ Estas modificaciones permiten que el juego deje de ser estático y que los objet
 Controles: 
 Jugador 1	W / S
 Jugador 2	O / L
+## Práctica 2: Comunicación mediante tuberías FIFO
+
+En esta práctica se ha implementado la comunicación entre el juego de tenis y un proceso logger mediante una tubería FIFO
+
+- Se ha creado el programa logger
+- Logger crea y abre la FIFO /tmp/fifo para lectura
+- CMundo abre la FIFO para escritura
+- Cuando un jugador consigue un punto, tenis envía un mensaje al logger
+- Logger muestra por pantalla los puntos de cada jugador
+- Cuando un jugador alcanza 3 puntos, tenis termina y logger también finaliza
+- Se ha modificado CMakeLists.txt para compilar logger
