@@ -1,4 +1,4 @@
-S# Práctica 1 Entorno de desarrollo Linux
+# Práctica 1 Entorno de desarrollo Linux
 
 ## Descripción
 
@@ -25,3 +25,16 @@ En esta práctica se ha implementado la comunicación entre el juego de tenis y 
 - Logger muestra por pantalla los puntos de cada jugador
 - Cuando un jugador alcanza 3 puntos, tenis termina y logger también finaliza
 - Se ha modificado CMakeLists.txt para compilar logger
+
+## Práctica 3: Comunicación mediante archivo proyectado en memoria
+
+En esta práctica se ha implementado la comunicación entre el juego de tenis y un proceso bot mediante un fichero proyectado en memoria.
+
+- Se ha creado la estructura DatosMemCompartida para compartir la pelota, la raqueta1 y la acción a realizar
+- El programa tenis crea el fichero compartido utilizando open y ftruncate y lo proyecta en memoria mediante mmap
+- El programa bot abre el mismo fichero y accede a los datos mediante mmap
+- Tenis actualiza la posición de la pelota y de la raqueta1
+- El bot decide automáticamente la acción de la raqueta1 según la posición de la pelota
+- La acción puede ser: 1 arriba, 0 nada o -1 abajo
+- Se ha añadido el programa bot al CMakeLists.txt
+- Al ejecutar la práctica funcionan simultáneamente los procesos tenis, logger y bot

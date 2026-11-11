@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+#include <sys/mman.h>
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -156,7 +156,14 @@ void CMundo::OnTimer(int value)
 		if (puntos1 >= 3)
    			 exit(0);
 }
-
+datos->esfera = esfera;
+datos->raqueta1 = jugador1;
+if(datos->accion == -1)
+    OnKeyboardDown('s', 0, 0);
+if(datos->accion == 1)
+    OnKeyboardDown('w', 0, 0);
+if(datos->accion == 0)
+    jugador1.velocidad.y = 0;
 }
 
 void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
@@ -176,6 +183,13 @@ void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
 void CMundo::Init()
 {
 fd = open("/tmp/fifo", O_WRONLY);
+int fd_mem;
+fd_mem = open("datos.dat", O_RDWR | O_CREAT, 0666);
+ftruncate(fd_mem, sizeof(DatosMemCompartida));
+datos = (DatosMemCompartida*)mmap(NULL, sizeof(DatosMemCompartida),
+                                  PROT_READ | PROT_WRITE,
+                                  MAP_SHARED, fd_mem, 0);
+close(fd_mem);
 	Plano p;
 //pared inferior
 	p.x1=-7;p.y1=-5;
