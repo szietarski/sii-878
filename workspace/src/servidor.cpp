@@ -26,7 +26,6 @@ int main(int argc,char* argv[])
 	//glutMouseFunc(OnRaton);
 
 	glutTimerFunc(25,OnTimer,0);//le decimos que dentro de 25ms llame 1 vez a la funcion OnTimer()
-	glutKeyboardFunc(OnKeyboardDown);
 	glutSetCursor(GLUT_CURSOR_FULL_CROSSHAIR);
 	
 	mundo.InitGL();
