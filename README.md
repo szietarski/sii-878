@@ -38,3 +38,17 @@ En esta práctica se ha implementado la comunicación entre el juego de tenis y 
 - La acción puede ser: 1 arriba, 0 nada o -1 abajo
 - Se ha añadido el programa bot al CMakeLists.txt
 - Al ejecutar la práctica funcionan simultáneamente los procesos tenis, logger y bot
+
+## Práctica 4: Concurrencia
+
+En esta práctica se ha dividido el programa de tenis en un cliente y un servidor.
+
+- Se han creado los programas servidor y cliente
+- El servidor envía al cliente el estado del juego mediante una tubería FIFO
+- El cliente recibe las posiciones de la pelota, las raquetas y la puntuación
+- El cliente envía las teclas pulsadas al servidor mediante una segunda tubería FIFO
+- El servidor utiliza un hilo pthread para recibir los comandos del jugador sin bloquear el juego
+- Logger continúa comunicándose con el servidor
+- Bot continúa comunicándose con el cliente mediante el archivo proyectado en memoria
+- Se ha modificado CMakeLists.txt para compilar cliente y servidor
+- Se ha comprobado el funcionamiento simultáneo de logger, servidor, cliente y bot

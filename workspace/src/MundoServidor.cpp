@@ -1,8 +1,9 @@
 // Mundo.cpp: implementation of the CMundo class.
 //
 //////////////////////////////////////////////////////////////////////
+#include <sys/stat.h>
 #include <fstream>
-#include "Mundo.h"
+#include "MundoServidor.h"
 #include "glut.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -14,6 +15,12 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
+void* hilo_comandos(void* d)
+{
+    CMundo* p = (CMundo*) d;
+    p->RecibeComandosJugador();
+    return NULL;
+}
 
 CMundo::CMundo()
 {
@@ -22,7 +29,10 @@ CMundo::CMundo()
 
 CMundo::~CMundo()
 {
-close(fd);
+	close(fd);
+	close(fd_cliente);
+	close(fd_teclas); 
+   	unlink("/tmp/fifo_servidor_cliente");
 }
 
 void CMundo::InitGL()
@@ -156,14 +166,13 @@ void CMundo::OnTimer(int value)
 		if (puntos1 >= 3)
    			 exit(0);
 }
-datos->esfera = esfera;
-datos->raqueta1 = jugador1;
-if(datos->accion == -1)
-    OnKeyboardDown('s', 0, 0);
-if(datos->accion == 1)
-    OnKeyboardDown('w', 0, 0);
-if(datos->accion == 0)
-    jugador1.velocidad.y = 0;
+char cad[200];
+sprintf(cad,"%f %f %f %f %f %f %f %f %f %f %d %d",
+        esfera.centro.x, esfera.centro.y,
+        jugador1.x1, jugador1.y1, jugador1.x2, jugador1.y2,
+        jugador2.x1, jugador2.y1, jugador2.x2, jugador2.y2,
+        puntos1, puntos2);
+write(fd_cliente, cad, strlen(cad) + 1);
 }
 
 void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
@@ -180,16 +189,31 @@ void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
 	}
 }
 
+void CMundo::RecibeComandosJugador()
+{
+    while (1)
+    {
+        usleep(10);
+        char cad[100];
+        read(fd_teclas, cad, sizeof(cad));
+
+        unsigned char key;
+        sscanf(cad, "%c", &key);
+
+        if(key == 's') jugador1.velocidad.y = -4;
+        if(key == 'w') jugador1.velocidad.y = 4;
+        if(key == 'l') jugador2.velocidad.y = -4;
+        if(key == 'o') jugador2.velocidad.y = 4;
+    }
+}
+
 void CMundo::Init()
 {
 fd = open("/tmp/fifo", O_WRONLY);
-int fd_mem;
-fd_mem = open("datos.dat", O_RDWR | O_CREAT, 0666);
-ftruncate(fd_mem, sizeof(DatosMemCompartida));
-datos = (DatosMemCompartida*)mmap(NULL, sizeof(DatosMemCompartida),
-                                  PROT_READ | PROT_WRITE,
-                                  MAP_SHARED, fd_mem, 0);
-close(fd_mem);
+mkfifo("/tmp/fifo_servidor_cliente", 0666);
+fd_cliente = open("/tmp/fifo_servidor_cliente", O_WRONLY);
+fd_teclas = open("/tmp/fifo_cliente_servidor", O_RDONLY);
+pthread_create(&thid1, NULL, hilo_comandos, this);
 	Plano p;
 //pared inferior
 	p.x1=-7;p.y1=-5;
